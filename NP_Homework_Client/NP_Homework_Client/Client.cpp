@@ -92,8 +92,14 @@ int main(int argc, char *argv[])
 		if(buf[len-1] == '\n')
 			buf[len-1] = '\0';
 		if(strlen(buf) == 0)
-			break;
-
+			continue;
+		
+		
+	HOSTENT *ptr = gethostbyname(buf);
+	if(ptr == NULL){
+		err_display("gethostbyname()");
+		continue;
+	}
 		// 데이터 보내기
 		retval = send(sock, buf, strlen(buf), 0);
 		if(retval == SOCKET_ERROR){
