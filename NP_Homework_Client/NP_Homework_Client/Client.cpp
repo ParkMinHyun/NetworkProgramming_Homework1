@@ -102,7 +102,8 @@ int main(int argc, char *argv[])
 			err_display("gethostbyname()");
 			continue;
 		}
-		
+
+		indexOfDomain = 0;
 		domainInfo[indexOfDomain] = (char *) malloc ( sizeof(char*) * strlen(ptr->h_name));
 		domainInfo[indexOfDomain++] = ptr->h_name;
 		
@@ -130,25 +131,25 @@ int main(int argc, char *argv[])
 
 		for(int i=0; i< indexOfDomain; i++){
 			
-		// 데이터 입력(시뮬레이션)
-		len = strlen(domainInfo[i]);
-		strncpy(buf, domainInfo[i], len);
+			// 데이터 입력(시뮬레이션)
+			len = strlen(domainInfo[i]);
+			strncpy(buf, domainInfo[i], len);
 
-		// 데이터 보내기(고정 길이)
-		retval = send(sock, (char *)&len, sizeof(int), 0);
-		if(retval == SOCKET_ERROR){
-			err_display("send()");
-			break;
-		}
+			// 데이터 보내기(고정 길이)
+			retval = send(sock, (char *)&len, sizeof(int), 0);
+			if(retval == SOCKET_ERROR){
+				err_display("send()");
+				break;
+			}
 
-		// 데이터 보내기(가변 길이)
-		retval = send(sock, buf, len, 0);
-		if(retval == SOCKET_ERROR){
-			err_display("send()");
-			break;
-		}
-		printf("[TCP 클라이언트] %d+%d바이트를 "
-			"보냈습니다.\n", sizeof(int), retval);
+			// 데이터 보내기(가변 길이)
+			retval = send(sock, buf, len, 0);
+			if(retval == SOCKET_ERROR){
+				err_display("send()");
+				break;
+			}
+			printf("[TCP 클라이언트] %d+%d바이트를 "
+				"보냈습니다.\n", sizeof(int), retval);
 
 			// 데이터 받기
 			retval = recvn(sock, buf, retval, 0);
@@ -161,8 +162,9 @@ int main(int argc, char *argv[])
 
 			// 받은 데이터 출력
 			buf[retval] = '\0';
-			printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
+			//printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
 			printf("[받은 데이터] %s\n", buf);
+			
 		}
 	}
 
