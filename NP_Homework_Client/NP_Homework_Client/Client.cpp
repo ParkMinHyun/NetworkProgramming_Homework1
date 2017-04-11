@@ -89,6 +89,10 @@ int main(int argc, char *argv[])
 		printf("\n[보낼 데이터] ");
 		if(fgets(buf, BUFSIZE+1, stdin) == NULL)
 			break;
+		
+		// Client 종료하기
+		if(!strcmp(buf,"exit\n"))
+			exit(1);
 
 		// '\n' 문자 제거
 		len = strlen(buf);
@@ -97,6 +101,7 @@ int main(int argc, char *argv[])
 		if(strlen(buf) == 0)
 			continue;
 		
+
 		HOSTENT *ptr = gethostbyname(buf);
 		if(ptr == NULL){
 			err_display("gethostbyname()");
