@@ -114,12 +114,12 @@ int main(int argc, char *argv[])
 	    }
 
 		char **ptr3 = ptr->h_addr_list;
-		IN_ADDR addr;
 		int index =0;
 		char **temp;
 		temp = (char**)malloc(sizeof(char*)*5);
 		for(int i=0; i<5; i++)
 			temp[i] = (char*)malloc(sizeof(char)*100);
+		IN_ADDR addr;
 	    while(*ptr3){
 			memcpy(&addr, *ptr3, ptr->h_length);
 			strcpy(temp[index],inet_ntoa(addr)); 
@@ -128,21 +128,27 @@ int main(int argc, char *argv[])
 		    ++ptr3;
 	    }
 
-		for(int i=0; i< indexOfDomain; i++)
-		{
-			printf("%s \n", domainInfo[i]);
-		}
-		
+		for(int i=0; i< indexOfDomain; i++){
+			
+		// 데이터 입력(시뮬레이션)
+		len = strlen(domainInfo[i]);
+		strncpy(buf, domainInfo[i], len);
 
-		//sizeof(a) / sizeof(int);
-		for(int i=0; i< sizeof(int); i++){
-			// 데이터 보내기
-			retval = send(sock, buf, strlen(buf), 0);
-			if(retval == SOCKET_ERROR){
-				err_display("send()");
-				break;
-			}
-			printf("[TCP 클라이언트] %d바이트를 보냈습니다.\n", retval);
+		// 데이터 보내기(고정 길이)
+		retval = send(sock, (char *)&len, sizeof(int), 0);
+		if(retval == SOCKET_ERROR){
+			err_display("send()");
+			break;
+		}
+
+		// 데이터 보내기(가변 길이)
+		retval = send(sock, buf, len, 0);
+		if(retval == SOCKET_ERROR){
+			err_display("send()");
+			break;
+		}
+		printf("[TCP 클라이언트] %d+%d바이트를 "
+			"보냈습니다.\n", sizeof(int), retval);
 
 			// 데이터 받기
 			retval = recvn(sock, buf, retval, 0);
