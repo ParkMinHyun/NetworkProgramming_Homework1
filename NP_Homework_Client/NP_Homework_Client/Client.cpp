@@ -57,6 +57,9 @@ int recvn(SOCKET s, char *buf, int len, int flags)
 int main(int argc, char *argv[])
 {
 	int retval;
+	int size=3;
+	int indexOfDomain = 0;
+	char *domainInfo[7];
 
 	// 윈속 초기화
 	WSADATA wsa;
@@ -94,33 +97,67 @@ int main(int argc, char *argv[])
 		if(strlen(buf) == 0)
 			continue;
 		
+		HOSTENT *ptr = gethostbyname(buf);
+		if(ptr == NULL){
+			err_display("gethostbyname()");
+			continue;
+		}
 		
-	HOSTENT *ptr = gethostbyname(buf);
-	if(ptr == NULL){
-		err_display("gethostbyname()");
-		continue;
-	}
-		// 데이터 보내기
-		retval = send(sock, buf, strlen(buf), 0);
-		if(retval == SOCKET_ERROR){
-			err_display("send()");
-			break;
-		}
-		printf("[TCP 클라이언트] %d바이트를 보냈습니다.\n", retval);
+		domainInfo[indexOfDomain] = (char *) malloc ( sizeof(char*) * strlen(ptr->h_name));
+		domainInfo[indexOfDomain++] = ptr->h_name;
+		
+	    char **ptr2 = ptr->h_aliases;
+	    while(*ptr2){
+			domainInfo[indexOfDomain] = (char *) malloc (sizeof(char*) * strlen(*ptr2));
+			domainInfo[indexOfDomain++] = *ptr2;
+		    ++ptr2;
+	    }
 
-		// 데이터 받기
-		retval = recvn(sock, buf, retval, 0);
-		if(retval == SOCKET_ERROR){
-			err_display("recv()");
-			break;
-		}
-		else if(retval == 0)
-			break;
+		char **ptr3 = ptr->h_addr_list;
+		IN_ADDR addr;
+		int index =0;
+		char **temp;
+		temp = (char**)malloc(sizeof(char*)*5);
+		for(int i=0; i<5; i++)
+			temp[i] = (char*)malloc(sizeof(char)*100);
+	    while(*ptr3){
+			memcpy(&addr, *ptr3, ptr->h_length);
+			strcpy(temp[index],inet_ntoa(addr)); 
+			domainInfo[indexOfDomain] = (char *) malloc ( sizeof(char*) * strlen(*ptr3));
+			domainInfo[indexOfDomain++] = temp[index++];
+		    ++ptr3;
+	    }
 
-		// 받은 데이터 출력
-		buf[retval] = '\0';
-		printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
-		printf("[받은 데이터] %s\n", buf);
+		for(int i=0; i< indexOfDomain; i++)
+		{
+			printf("%s \n", domainInfo[i]);
+		}
+		
+
+		//sizeof(a) / sizeof(int);
+		for(int i=0; i< sizeof(int); i++){
+			// 데이터 보내기
+			retval = send(sock, buf, strlen(buf), 0);
+			if(retval == SOCKET_ERROR){
+				err_display("send()");
+				break;
+			}
+			printf("[TCP 클라이언트] %d바이트를 보냈습니다.\n", retval);
+
+			// 데이터 받기
+			retval = recvn(sock, buf, retval, 0);
+			if(retval == SOCKET_ERROR){
+				err_display("recv()");
+				break;
+			}
+			else if(retval == 0)
+				break;
+
+			// 받은 데이터 출력
+			buf[retval] = '\0';
+			printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
+			printf("[받은 데이터] %s\n", buf);
+		}
 	}
 
 	// closesocket()
