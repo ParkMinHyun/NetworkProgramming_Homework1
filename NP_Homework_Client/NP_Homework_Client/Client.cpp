@@ -90,9 +90,6 @@ int main(int argc, char *argv[])
 		if(fgets(buf, BUFSIZE+1, stdin) == NULL)
 			break;
 		
-		// Client 종료하기
-		if(!strcmp(buf,"exit\n"))
-			exit(1);
 
 		// '\n' 문자 제거
 		len = strlen(buf);
@@ -101,18 +98,25 @@ int main(int argc, char *argv[])
 		if(strlen(buf) == 0)
 			continue;
 		
+		indexOfDomain = 0;
+		
+		if(!strcmp(buf,"exit")){
+			
+			domainInfo[indexOfDomain] = (char *) malloc ( sizeof(char*) * strlen("exit"));
+			domainInfo[indexOfDomain++] = "exit";
 
+		}
+
+		else{	
 		HOSTENT *ptr = gethostbyname(buf);
 		if(ptr == NULL){
 			err_display("gethostbyname()");
 			continue;
 		}
 
-		indexOfDomain = 0;
 		domainInfo[indexOfDomain] = (char *) malloc ( sizeof(char*) * strlen(ptr->h_name));
 		domainInfo[indexOfDomain++] = ptr->h_name;
-		
-		
+
 		int aliases_index =0;
 		char **aliases_temp;
 	    char **ptr2 = ptr->h_aliases;
@@ -141,7 +145,7 @@ int main(int argc, char *argv[])
 			domainInfo[indexOfDomain++] = ip_temp[ip_index++];
 		    ++ptr3;
 	    }
-
+		}
 		for(int i=0; i< indexOfDomain; i++){
 			
 			// 데이터 입력(시뮬레이션)
@@ -173,6 +177,10 @@ int main(int argc, char *argv[])
 			else if(retval == 0)
 				break;
 
+			
+		// Client 종료하기
+		if(!strcmp(buf,"exit"))
+			exit(1);
 			// 받은 데이터 출력
 			buf[retval] = '\0';
 			//printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);

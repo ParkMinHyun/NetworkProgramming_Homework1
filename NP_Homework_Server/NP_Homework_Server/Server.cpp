@@ -129,6 +129,12 @@ int main(int argc, char *argv[])
 				err_display("send()");
 				break;
 			}
+			
+		if(!strcmp(buf,"exit")){
+			printf("Server 종료합니다.");
+			exit(1);
+		}
+			
 		}
 
 		// closesocket()
