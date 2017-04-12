@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 	int retval;
 	int size=3;
 	int indexOfDomain = 0;
-	char *domainInfo[7];
+	char *domainInfo[20];
 
 	// 윈속 초기화
 	WSADATA wsa;
@@ -112,25 +112,33 @@ int main(int argc, char *argv[])
 		domainInfo[indexOfDomain] = (char *) malloc ( sizeof(char*) * strlen(ptr->h_name));
 		domainInfo[indexOfDomain++] = ptr->h_name;
 		
+		
+		int aliases_index =0;
+		char **aliases_temp;
 	    char **ptr2 = ptr->h_aliases;
+		
+		aliases_temp = (char**)malloc(sizeof(char*)*15);
+		for(int i=0; i<15; i++)
+			aliases_temp[i] = (char*)malloc(sizeof(char)*100);
 	    while(*ptr2){
+			strcpy(aliases_temp[aliases_index],*ptr2); 
 			domainInfo[indexOfDomain] = (char *) malloc (sizeof(char*) * strlen(*ptr2));
-			domainInfo[indexOfDomain++] = *ptr2;
+			domainInfo[indexOfDomain++] = aliases_temp[aliases_index];
 		    ++ptr2;
 	    }
 
 		char **ptr3 = ptr->h_addr_list;
-		int index =0;
-		char **temp;
-		temp = (char**)malloc(sizeof(char*)*5);
-		for(int i=0; i<5; i++)
-			temp[i] = (char*)malloc(sizeof(char)*100);
+		int ip_index =0;
+		char **ip_temp;
+		ip_temp = (char**)malloc(sizeof(char*)*15);
+		for(int i=0; i<15; i++)
+			ip_temp[i] = (char*)malloc(sizeof(char)*100);
 		IN_ADDR addr;
 	    while(*ptr3){
 			memcpy(&addr, *ptr3, ptr->h_length);
-			strcpy(temp[index],inet_ntoa(addr)); 
+			strcpy(ip_temp[ip_index],inet_ntoa(addr)); 
 			domainInfo[indexOfDomain] = (char *) malloc ( sizeof(char*) * strlen(*ptr3));
-			domainInfo[indexOfDomain++] = temp[index++];
+			domainInfo[indexOfDomain++] = ip_temp[ip_index++];
 		    ++ptr3;
 	    }
 
