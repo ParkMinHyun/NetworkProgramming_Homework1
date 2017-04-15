@@ -108,8 +108,8 @@ int main(int argc, char *argv[])
 		}
 
 		else {
-			
-/*
+
+			/*
 			domainInfo[indexOfDomain] = (char *)malloc(sizeof(char*) * strlen(ptr->h_name));
 			domainInfo[indexOfDomain++] = ptr->h_name;
 
@@ -119,12 +119,12 @@ int main(int argc, char *argv[])
 
 			aliases_temp = (char**)malloc(sizeof(char*) * 15);
 			for (int i = 0; i < 15; i++)
-				aliases_temp[i] = (char*)malloc(sizeof(char) * 100);
+			aliases_temp[i] = (char*)malloc(sizeof(char) * 100);
 			while (*ptr2) {
-				strcpy(aliases_temp[aliases_index], *ptr2);
-				domainInfo[indexOfDomain] = (char *)malloc(sizeof(char*) * strlen(*ptr2));
-				domainInfo[indexOfDomain++] = aliases_temp[aliases_index];
-				++ptr2;
+			strcpy(aliases_temp[aliases_index], *ptr2);
+			domainInfo[indexOfDomain] = (char *)malloc(sizeof(char*) * strlen(*ptr2));
+			domainInfo[indexOfDomain++] = aliases_temp[aliases_index];
+			++ptr2;
 			}
 
 			char **ptr3 = ptr->h_addr_list;
@@ -132,56 +132,64 @@ int main(int argc, char *argv[])
 			char **ip_temp;
 			ip_temp = (char**)malloc(sizeof(char*) * 15);
 			for (int i = 0; i < 15; i++)
-				ip_temp[i] = (char*)malloc(sizeof(char) * 100);
+			ip_temp[i] = (char*)malloc(sizeof(char) * 100);
 			IN_ADDR addr;
 			while (*ptr3) {
-				memcpy(&addr, *ptr3, ptr->h_length);
-				strcpy(ip_temp[ip_index], inet_ntoa(addr));
-				domainInfo[indexOfDomain] = (char *)malloc(sizeof(char*) * strlen(*ptr3));
-				domainInfo[indexOfDomain++] = ip_temp[ip_index++];
-				++ptr3;
+			memcpy(&addr, *ptr3, ptr->h_length);
+			strcpy(ip_temp[ip_index], inet_ntoa(addr));
+			domainInfo[indexOfDomain] = (char *)malloc(sizeof(char*) * strlen(*ptr3));
+			domainInfo[indexOfDomain++] = ip_temp[ip_index++];
+			++ptr3;
 			}*/
 		}
 		//for (int i = 0; i < indexOfDomain; i++) {
-			// 데이터 입력(시뮬레이션)
-			len = strlen(buf);
-			//strncpy(buf, domainInfo[i], len);
+		// 데이터 입력(시뮬레이션)
+		len = strlen(buf);
+		//strncpy(buf, domainInfo[i], len);
 
-			// 데이터 보내기(고정 길이)
-			retval = send(sock, (char *)&len, sizeof(int), 0);
-			if (retval == SOCKET_ERROR) {
-				err_display("send()");
-				break;
-			}
+		// 데이터 보내기(고정 길이)
+		retval = send(sock, (char *)&len, sizeof(int), 0);
+		if (retval == SOCKET_ERROR) {
+			err_display("send()");
+			break;
+		}
 
-			// 데이터 보내기(가변 길이)
-			retval = send(sock, buf, len, 0);
-			if (retval == SOCKET_ERROR) {
-				err_display("send()");
-				break;
-			}
-			printf("[TCP 클라이언트] %d+%d바이트를 "
-				"보냈습니다.\n", sizeof(int), retval);
-
-			// 데이터 받기
-			retval = recvn(sock, buf, retval, 0);
-			if (retval == SOCKET_ERROR) {
+		// 데이터 보내기(가변 길이)
+		retval = send(sock, buf, len, 0);
+		if (retval == SOCKET_ERROR) {
+			err_display("send()");
+			break;
+		}
+		printf("[TCP 클라이언트] %d+%d바이트를 "
+			"보냈습니다.\n", sizeof(int), retval);
+			
+		
+			// 데이터 받기(고정 길이)
+			retval = recvn(sock, (char *)&len, sizeof(int), 0);
+			if(retval == SOCKET_ERROR){
 				err_display("recv()");
 				break;
 			}
-			else if (retval == 0)
+			else if(retval == 0)
+				break;
+
+			// 데이터 받기(가변 길이)
+			retval = recvn(sock, buf, len, 0);
+			if(retval == SOCKET_ERROR){
+				err_display("recv()");
+				break;
+			}
+			else if(retval == 0)
 				break;
 
 
-			// Client 종료하기
-			if (!strcmp(buf, "exit"))
-				exit(1);
-			// 받은 데이터 출력
-			buf[retval] = '\0';
-			//printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
-			printf("[받은 데이터] %s\n", buf);
-
-		
+		// Client 종료하기
+		if (!strcmp(buf, "exit"))
+			exit(1);
+		// 받은 데이터 출력
+		buf[retval] = '\0';
+		//printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
+		printf("[받은 데이터] %s\n", buf);
 	}
 
 	// closesocket()

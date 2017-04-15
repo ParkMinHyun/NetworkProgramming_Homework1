@@ -128,13 +128,24 @@ int main(int argc, char *argv[])
 				err_display("gethostbyname()");
 				continue;
 			}
+			
+		// 데이터 보내기(고정 길이)
+		retval = send(client_sock, (char *)&len, sizeof(int), 0);
+		if (retval == SOCKET_ERROR) {
+			err_display("send()");
+			break;
+		}
 
-			// 데이터 보내기
-			retval = send(client_sock, buf, retval, 0);
-			if(retval == SOCKET_ERROR){
-				err_display("send()");
-				break;
-			}
+		// 데이터 보내기(가변 길이)
+		retval = send(client_sock, buf, len, 0);
+		if (retval == SOCKET_ERROR) {
+			err_display("send()");
+			break;
+		}
+		printf("[TCP 클라이언트] %d+%d바이트를 "
+			"보냈습니다.\n", sizeof(int), retval);
+			
+		
 			
 		if(!strcmp(buf,"exit")){
 			printf("Server 종료합니다.");
