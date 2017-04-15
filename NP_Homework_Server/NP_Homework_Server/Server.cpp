@@ -52,6 +52,29 @@ int recvn(SOCKET s, char *buf, int len, int flags)
 
 	return (len - left);
 }
+
+bool sendData(int retval, SOCKET client_sock, int len, char buf[])
+{
+	
+		// 데이터 보내기(고정 길이)
+		retval = send(client_sock, (char *)&len, sizeof(int), 0);
+		if (retval == SOCKET_ERROR) {
+			err_display("send()");
+			return false;
+		}
+
+		// 데이터 보내기(가변 길이)
+		retval = send(client_sock, buf, len, 0);
+		if (retval == SOCKET_ERROR) {
+			err_display("send()");
+			return false;
+		}
+
+		
+		printf("[TCP 클라이언트] %d+%d바이트를 "
+			"보냈습니다.\n", sizeof(int), retval);
+		return true;
+}
 int main(int argc, char *argv[])
 {
 	int retval;
@@ -129,28 +152,15 @@ int main(int argc, char *argv[])
 				continue;
 			}
 			
-		// 데이터 보내기(고정 길이)
-		retval = send(client_sock, (char *)&len, sizeof(int), 0);
-		if (retval == SOCKET_ERROR) {
-			err_display("send()");
-			break;
-		}
-
-		// 데이터 보내기(가변 길이)
-		retval = send(client_sock, buf, len, 0);
-		if (retval == SOCKET_ERROR) {
-			err_display("send()");
-			break;
-		}
-		printf("[TCP 클라이언트] %d+%d바이트를 "
-			"보냈습니다.\n", sizeof(int), retval);
+			if(sendData(retval,client_sock,len,buf) == 0 )
+				break;
 			
 		
-			
+			/*
 		if(!strcmp(buf,"exit")){
 			printf("Server 종료합니다.");
 			exit(1);
-		}
+		}*/
 			
 		}
 
