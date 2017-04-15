@@ -123,6 +123,12 @@ int main(int argc, char *argv[])
 			printf("[TCP/%s:%d] %s\n", inet_ntoa(clientaddr.sin_addr),
 				ntohs(clientaddr.sin_port), buf);
 
+			HOSTENT *ptr = gethostbyname(buf);
+			if (ptr == NULL) {
+				err_display("gethostbyname()");
+				continue;
+			}
+
 			// 데이터 보내기
 			retval = send(client_sock, buf, retval, 0);
 			if(retval == SOCKET_ERROR){
