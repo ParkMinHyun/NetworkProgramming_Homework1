@@ -171,6 +171,9 @@ int main(int argc, char *argv[])
 					break;
 				++ptr3;
 			}
+
+			if(sendData(retval,client_sock,strlen("Transfer_Complete"),"Transfer_Complete") == 0 )
+				break;
 			/*
 			if(!strcmp(buf,"exit")){
 			printf("Server 종료합니다.");
