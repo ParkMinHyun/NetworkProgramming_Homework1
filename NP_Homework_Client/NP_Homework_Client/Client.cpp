@@ -56,31 +56,31 @@ int recvn(SOCKET s, char *buf, int len, int flags)
 
 bool receiveData(int retval, SOCKET sock, int len, char buf[])
 {
-	
-			// 데이터 받기(고정 길이)
-			retval = recvn(sock, (char *)&len, sizeof(int), 0);
-			if(retval == SOCKET_ERROR){
-				err_display("recv()");
-				return false;
-			}
-			else if(retval == 0)
-				return false;
 
-			// 데이터 받기(가변 길이)
-			retval = recvn(sock, buf, len, 0);
-			if(retval == SOCKET_ERROR){
-				err_display("recv()");
-				return false;
-			}
-			else if(retval == 0)
-				return false;
+	// 데이터 받기(고정 길이)
+	retval = recvn(sock, (char *)&len, sizeof(int), 0);
+	if(retval == SOCKET_ERROR){
+		err_display("recv()");
+		return false;
+	}
+	else if(retval == 0)
+		return false;
 
-		// 받은 데이터 출력
-		buf[retval] = '\0';
-		//printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
-		printf("[받은 데이터] %s\n", buf);
+	// 데이터 받기(가변 길이)
+	retval = recvn(sock, buf, len, 0);
+	if(retval == SOCKET_ERROR){
+		err_display("recv()");
+		return false;
+	}
+	else if(retval == 0)
+		return false;
 
-		return true;
+	// 받은 데이터 출력
+	buf[retval] = '\0';
+	//printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
+	printf("[받은 데이터] %s\n", buf);
+
+	return true;
 }
 int main(int argc, char *argv[])
 {
@@ -190,11 +190,12 @@ int main(int argc, char *argv[])
 		}
 		printf("[TCP 클라이언트] %d+%d바이트를 "
 			"보냈습니다.\n", sizeof(int), retval);
-			
-		
 
-		if(receiveData(retval, sock, len, buf) == 0)
-			break;
+
+		while(1){
+			if(receiveData(retval, sock, len, buf) == 0)
+				break;
+		}
 	}
 
 	// closesocket()

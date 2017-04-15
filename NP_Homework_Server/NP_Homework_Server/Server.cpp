@@ -55,25 +55,25 @@ int recvn(SOCKET s, char *buf, int len, int flags)
 
 bool sendData(int retval, SOCKET client_sock, int len, char buf[])
 {
-	
-		// 데이터 보내기(고정 길이)
-		retval = send(client_sock, (char *)&len, sizeof(int), 0);
-		if (retval == SOCKET_ERROR) {
-			err_display("send()");
-			return false;
-		}
 
-		// 데이터 보내기(가변 길이)
-		retval = send(client_sock, buf, len, 0);
-		if (retval == SOCKET_ERROR) {
-			err_display("send()");
-			return false;
-		}
+	// 데이터 보내기(고정 길이)
+	retval = send(client_sock, (char *)&len, sizeof(int), 0);
+	if (retval == SOCKET_ERROR) {
+		err_display("send()");
+		return false;
+	}
 
-		
-		printf("[TCP 클라이언트] %d+%d바이트를 "
-			"보냈습니다.\n", sizeof(int), retval);
-		return true;
+	// 데이터 보내기(가변 길이)
+	retval = send(client_sock, buf, len, 0);
+	if (retval == SOCKET_ERROR) {
+		err_display("send()");
+		return false;
+	}
+
+
+	printf("[TCP 클라이언트] %d+%d바이트를 "
+		"보냈습니다.\n", sizeof(int), retval);
+	return true;
 }
 int main(int argc, char *argv[])
 {
@@ -151,17 +151,32 @@ int main(int argc, char *argv[])
 				err_display("gethostbyname()");
 				continue;
 			}
-			
-			if(sendData(retval,client_sock,len,buf) == 0 )
+
+			if(sendData(retval,client_sock,strlen(ptr->h_name),ptr->h_name) == 0 )
 				break;
-			
-		
+
+			char **ptr2 = ptr->h_aliases;
+			while(*ptr2){
+				
+				if(sendData(retval,client_sock,strlen(*ptr2),*ptr2) == 0 )
+					break;
+				++ptr2;
+			}
+
+			IN_ADDR addr;
+			char **ptr3 = ptr->h_addr_list;
+			while(*ptr3){
+				memcpy(&addr, *ptr3, ptr->h_length);
+				if(sendData(retval,client_sock,strlen(inet_ntoa(addr)),inet_ntoa(addr)) == 0 )
+					break;
+				++ptr3;
+			}
 			/*
-		if(!strcmp(buf,"exit")){
+			if(!strcmp(buf,"exit")){
 			printf("Server 종료합니다.");
 			exit(1);
-		}*/
-			
+			}*/
+
 		}
 
 		// closesocket()
