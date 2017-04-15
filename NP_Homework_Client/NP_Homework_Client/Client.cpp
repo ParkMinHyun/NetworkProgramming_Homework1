@@ -82,6 +82,7 @@ bool receiveData(int retval, SOCKET sock, int len, char buf[])
 	if(!strcmp(buf,"Transfer_Complete"))
 		return false;
 	
+
 	printf("[받은 데이터] %s\n", buf);
 
 	return true;
@@ -89,9 +90,6 @@ bool receiveData(int retval, SOCKET sock, int len, char buf[])
 int main(int argc, char *argv[])
 {
 	int retval;
-	int size = 3;
-	int indexOfDomain = 0;
-	char *domainInfo[20];
 
 	// 윈속 초기화
 	WSADATA wsa;
@@ -122,7 +120,6 @@ int main(int argc, char *argv[])
 		if (fgets(buf, BUFSIZE + 1, stdin) == NULL)
 			break;
 
-
 		// '\n' 문자 제거
 		len = strlen(buf);
 		if (buf[len - 1] == '\n')
@@ -130,16 +127,7 @@ int main(int argc, char *argv[])
 		if (strlen(buf) == 0)
 			continue;
 
-		indexOfDomain = 0;
 
-		if (!strcmp(buf, "exit")) {
-
-			domainInfo[indexOfDomain] = (char *)malloc(sizeof(char*) * strlen("exit"));
-			domainInfo[indexOfDomain++] = "exit";
-
-		}
-
-		
 		// 데이터 입력(시뮬레이션)
 		len = strlen(buf);
 
@@ -156,20 +144,26 @@ int main(int argc, char *argv[])
 			err_display("send()");
 			break;
 		}
+
+		if(!strcmp(buf,"exit")){
+
+			// closesocket()
+			closesocket(sock);
+
+			// 윈속 종료
+			WSACleanup();
+			return 0;
+		}
 		printf("[TCP 클라이언트] %d+%d바이트를 "
 			"보냈습니다.\n", sizeof(int), retval);
 
 
 		while(1){
+			
 			if(receiveData(retval, sock, len, buf) == 0)
 				break;
 		}
 	}
 
-	// closesocket()
-	closesocket(sock);
-
-	// 윈속 종료
-	WSACleanup();
 	return 0;
 }
