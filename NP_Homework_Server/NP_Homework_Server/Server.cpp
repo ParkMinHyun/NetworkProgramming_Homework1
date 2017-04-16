@@ -53,6 +53,7 @@ int recvn(SOCKET s, char *buf, int len, int flags)
 	return (len - left);
 }
 
+// Server에서 Client로 Data를 송신하기 위한 함수
 bool sendData(int retval, SOCKET client_sock, int len, char buf[])
 {
 
@@ -75,6 +76,7 @@ bool sendData(int retval, SOCKET client_sock, int len, char buf[])
 		"보냈습니다.\n", sizeof(int), retval);
 	return true;
 }
+
 int main(int argc, char *argv[])
 {
 	int retval;
@@ -156,15 +158,19 @@ int main(int argc, char *argv[])
 			}
 
 			else{
+
+				// hostname에 대한 정보를 ptr에 저장
 				HOSTENT *ptr = gethostbyname(buf);
 				if (ptr == NULL) {
 					err_display("gethostbyname()");
 					continue;
 				}
 
+				// domain Name Client로 송신
 				if(sendData(retval,client_sock,strlen(ptr->h_name),ptr->h_name) == 0 )
 					break;
 
+				// domain Aliases Client로 송신
 				char **ptr2 = ptr->h_aliases;
 				while(*ptr2){
 
@@ -173,6 +179,7 @@ int main(int argc, char *argv[])
 					++ptr2;
 				}
 
+				// domain IP를 Client로 송신
 				IN_ADDR addr;
 				char **ptr3 = ptr->h_addr_list;
 				while(*ptr3){

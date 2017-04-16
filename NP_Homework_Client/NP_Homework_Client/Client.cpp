@@ -54,6 +54,7 @@ int recvn(SOCKET s, char *buf, int len, int flags)
 	return (len - left);
 }
 
+// Server에서 보내진 데이터 수신을 위한 함수
 bool receiveData(int retval, SOCKET sock, int len, char buf[])
 {
 
@@ -79,6 +80,7 @@ bool receiveData(int retval, SOCKET sock, int len, char buf[])
 	buf[retval] = '\0';
 	//printf("[TCP 클라이언트] %d바이트를 받았습니다.\n", retval);
 
+	// Server에서 Data가 전부 보내지면 return false;
 	if(!strcmp(buf,"Transfer_Complete"))
 		return false;
 	
@@ -128,6 +130,7 @@ int main(int argc, char *argv[])
 			continue;
 
 		// 도메인 네임 잘못되었을 때 에러 나타나기
+		// "exit" 문구는 예외
 		HOSTENT *ptr = gethostbyname(buf);
 		if (ptr == NULL && strcmp(buf,"exit")==1) {
 			err_display("gethostbyname()");
@@ -151,12 +154,11 @@ int main(int argc, char *argv[])
 			break;
 		}
 
-
+		// server에서 exit를 받으면 Client 및 Program 종료하기
 		if(!strcmp(buf,"exit")){
 
 			// closesocket()
 			closesocket(sock);
-
 			// 윈속 종료
 			WSACleanup();
 			return 0;
@@ -166,7 +168,8 @@ int main(int argc, char *argv[])
 
 
 		while(1){
-			
+			// Server에서 Data를 지속적으로 받기
+			// 만약 error가 나거나 Data가 전부 보내지면 break를 통해 무한 Loop를 벗어나기
 			if(receiveData(retval, sock, len, buf) == 0)
 				break;
 		}
