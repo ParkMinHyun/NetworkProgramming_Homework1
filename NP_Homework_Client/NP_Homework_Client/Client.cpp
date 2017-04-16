@@ -129,10 +129,10 @@ int main(int argc, char *argv[])
 
 		// 도메인 네임 잘못되었을 때 에러 나타나기
 		HOSTENT *ptr = gethostbyname(buf);
-		if (ptr == NULL ) {
+		if (ptr == NULL && strcmp(buf,"exit")==1) {
 			err_display("gethostbyname()");
 			continue;
-		}s
+		}
 
 		// 데이터 입력(시뮬레이션)
 		len = strlen(buf);
