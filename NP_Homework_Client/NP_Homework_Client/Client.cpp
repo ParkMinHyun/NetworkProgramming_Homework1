@@ -127,11 +127,17 @@ int main(int argc, char *argv[])
 		if (strlen(buf) == 0)
 			continue;
 
+		// 도메인 네임 잘못되었을 때 에러 나타나기
+		HOSTENT *ptr = gethostbyname(buf);
+		if (ptr == NULL ) {
+			err_display("gethostbyname()");
+			continue;
+		}s
 
 		// 데이터 입력(시뮬레이션)
 		len = strlen(buf);
 
-		// 데이터 보내기(고정 길이)
+		// Domain Name 데이터 보내기(고정 길이)
 		retval = send(sock, (char *)&len, sizeof(int), 0);
 		if (retval == SOCKET_ERROR) {
 			err_display("send()");
@@ -144,6 +150,7 @@ int main(int argc, char *argv[])
 			err_display("send()");
 			break;
 		}
+
 
 		if(!strcmp(buf,"exit")){
 
