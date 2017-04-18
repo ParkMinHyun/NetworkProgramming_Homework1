@@ -1,8 +1,13 @@
+// 2017년 1학기 네트워크프로그래밍 숙제 1번 클라이언트
+// 성명: 박민현 학번: 122179
+// 작동하는 도메인 네임: www.naver.com / www.facebook.com / www.netflix.com
+
 #pragma comment(lib, "ws2_32")
 #include <winsock2.h>
 #include <stdlib.h>
 #include <stdio.h>
 
+//만나서 반갑 뿌잉뿌잉
 #define SERVERIP   "127.0.0.1"
 #define SERVERPORT 9000
 #define BUFSIZE    512

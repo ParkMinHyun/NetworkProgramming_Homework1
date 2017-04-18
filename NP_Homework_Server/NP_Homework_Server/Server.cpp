@@ -1,3 +1,6 @@
+// 2017년 1학기 네트워크프로그래밍 숙제 1번 Server
+// 성명: 박민현 학번: 122179
+
 #pragma comment(lib, "ws2_32")
 #include <winsock2.h>
 #include <stdlib.h>
@@ -56,7 +59,6 @@ int recvn(SOCKET s, char *buf, int len, int flags)
 // Server에서 Client로 Data를 송신하기 위한 함수
 bool sendData(int retval, SOCKET client_sock, int len, char buf[])
 {
-
 	// 데이터 보내기(고정 길이)
 	retval = send(client_sock, (char *)&len, sizeof(int), 0);
 	if (retval == SOCKET_ERROR) {
@@ -71,9 +73,12 @@ bool sendData(int retval, SOCKET client_sock, int len, char buf[])
 		return false;
 	}
 
-
-	printf("[TCP 클라이언트] %d+%d바이트를 "
+	if(!strcmp(buf,"Transfer_Complete"))
+		printf("	Data 전송을 모두 완료하였습니다.\n");
+	else{
+		printf("[TCP 클라이언트] %d+%d바이트를 "
 		"보냈습니다.\n", sizeof(int), retval);
+	}
 	return true;
 }
 
@@ -148,8 +153,7 @@ int main(int argc, char *argv[])
 			printf("[TCP/%s:%d] %s\n", inet_ntoa(clientaddr.sin_addr),
 				ntohs(clientaddr.sin_port), buf);
 
-			if(!strcmp(buf,"exit"))
-			{
+			if(!strcmp(buf,"exit")){
 				// closesocket()
 				closesocket(listen_sock);
 				// 윈속 종료
@@ -158,7 +162,6 @@ int main(int argc, char *argv[])
 			}
 
 			else{
-
 				// hostname에 대한 정보를 ptr에 저장
 				HOSTENT *ptr = gethostbyname(buf);
 				if (ptr == NULL) {
@@ -191,16 +194,12 @@ int main(int argc, char *argv[])
 
 				if(sendData(retval,client_sock,strlen("Transfer_Complete"),"Transfer_Complete") == 0 )
 					break;
-				
 			}
 		}
-		
-
 		// closesocket()
 		closesocket(client_sock);
 		printf("[TCP 서버] 클라이언트 종료: IP 주소=%s, 포트 번호=%d\n",
 			inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
 	}
-
 	return 0;
 }
